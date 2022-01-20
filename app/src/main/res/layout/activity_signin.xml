@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/primary"
+    tools:context=".SignInActivity">
+
+    <ProgressBar
+        android:id="@+id/pb_singIn"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/accent"
+        android:visibility="invisible"
+        ></ProgressBar>
+
+    <ImageView
+        android:id="@+id/img_icon_signIn"
+        android:layout_width="200dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/icon"
+        ></ImageView>
+
+
+    <TextView
+        android:id="@+id/tv_signIn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/img_icon_signIn"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="Sing In"
+        android:textColor="@color/black"
+        android:textSize="30dp"
+        android:textStyle="bold"></TextView>
+
+
+        <EditText
+            android:id="@+id/et_signInEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_signIn"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="50dp"
+            android:backgroundTint="@color/accent"
+            android:hint="Email:"
+            android:textCursorDrawable="@null"
+            android:textSize="18sp"
+            android:inputType="textEmailAddress" />
+
+        <EditText
+            android:id="@+id/et_signInPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/et_signInEmail"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:hint="Password:"
+            android:textCursorDrawable="@null"
+            android:textSize="18sp"
+            android:backgroundTint="@color/accent"
+            android:inputType="textPassword" />
+
+        <Button
+            android:id="@+id/btn_singIn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/et_signInPassword"
+            android:layout_marginTop="50dp"
+            android:text="Sign In"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:backgroundTint="@color/accent"
+            android:textAllCaps="false"></Button>
+
+        <Button
+            android:id="@+id/btn_moveToSignUp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:text="Need a new account?"
+            android:backgroundTint="@color/accent"
+            android:textAllCaps="false"></Button>
+
+
+
+
+</RelativeLayout>

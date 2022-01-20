@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/primary"
+
+    tools:context=".SignUpActivity">
+
+    <ProgressBar
+        android:id="@+id/pb_singUp"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/accent"
+        android:visibility="invisible"
+        ></ProgressBar>
+
+    <ImageView
+        android:id="@+id/img_icon_singUp"
+        android:layout_width="200dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/icon"
+        ></ImageView>
+
+
+
+        <TextView
+            android:id="@+id/tv_signUp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/img_icon_singUp"
+            android:text="Sing up"
+            android:textColor="@color/black"
+            android:textSize="30dp"
+            android:textStyle="bold"></TextView>
+
+
+    <EditText
+        android:id="@+id/et_signUpEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_signUp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:hint="Email:"
+        android:backgroundTint="@color/accent"
+        android:inputType="textEmailAddress"
+        android:textCursorDrawable="@null" />
+
+    <EditText
+        android:id="@+id/et_signUpPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_signUpEmail"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="@color/accent"
+        android:hint="Password:"
+        android:inputType="textPassword"
+        android:textCursorDrawable="@null" />
+
+        <EditText
+            android:id="@+id/et_signUpRePassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/et_signUpPassword"
+            android:layout_centerHorizontal="true"
+            android:hint="Retype password:"
+            android:layout_marginTop="10dp"
+            android:textCursorDrawable="@null"
+            android:backgroundTint="@color/accent"
+            android:inputType="textPassword" />
+
+        <Button
+            android:id="@+id/btn_singUp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/et_signUpRePassword"
+            android:layout_marginTop="50dp"
+            android:text="Sign Up"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:textAllCaps="false"
+            android:backgroundTint="@color/accent"
+            ></Button>
+
+        <Button
+            android:id="@+id/btn_moveToSignIn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="5dp"
+            android:backgroundTint="@color/accent"
+            android:text="Already have an account?"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            ></Button>
+
+
+
+
+</RelativeLayout>
