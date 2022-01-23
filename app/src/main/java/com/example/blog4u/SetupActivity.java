@@ -23,15 +23,20 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -44,7 +49,8 @@ public class SetupActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private ProgressBar setupProgressBar;
 //    private FirebaseFirestore firebaseFirestore;
-//    private StorageReference storageReference;
+
+    private StorageReference storageReference;
     private FirebaseDatabase database ;
     private String userId;
     private Boolean isChanged = false;
@@ -73,21 +79,54 @@ public class SetupActivity extends AppCompatActivity {
                 if(ContextCompat.checkSelfPermission(SetupActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                     Toast.makeText(SetupActivity.this, "Permission Denied", Toast.LENGTH_LONG).show();
                     ActivityCompat.requestPermissions(SetupActivity.this, new String[] {Manifest.permission.READ_EXTERNAL_STORAGE} , 1);
-                } else {//TODO need to check a new image crop. (part 5 min-5:30~)
-                    Toast.makeText(SetupActivity.this, "Need to put here image crop", Toast.LENGTH_LONG).show();
-//                    ImagePicker.Companion.with(SetupActivity.this)
-//                            .cropOval()
-//                            .compress(200)
-//                            .start();
+                } else {
+                    bringImagePicker();
                 }
             } else {
-                //TODO do the same as previous else because permission already granted in these versions.
+                bringImagePicker();
             }
         });
 
         setupProgressBar.setVisibility(View.VISIBLE);
         setupBtn.setEnabled(false);
         //Retrieving the user's name and picture if exists.
+        getUserData();
+
+
+        setupBtn.setOnClickListener(v -> {
+            String userName = setupEditText.getText().toString();
+            if (!TextUtils.isEmpty(userName) && mainImageUri != null/*TODO relevant to the image crop and not mandatory*/) {
+                setupProgressBar.setVisibility(View.VISIBLE);
+                if(isChanged) {
+                    userId = firebaseAuth.getCurrentUser().getUid();
+                    setupProgressBar.setVisibility(View.VISIBLE);
+                    StorageReference imagePath = storageReference.child("profile_images").child(userId + ".jpg");
+                    imagePath.putFile(mainImageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                imagePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+                                        storeToDatabase(task, userName, uri);
+                                    }
+                                });
+                            } else {
+                                String error = task.getException().getMessage();
+                                Toast.makeText(SetupActivity.this, "Error: " + error, Toast.LENGTH_LONG).show();
+                                setupProgressBar.setVisibility(View.INVISIBLE);
+                            }
+                        }
+                    });
+
+                } else {
+                    storeToDatabase(null, userName, mainImageUri);
+                }
+            }
+        });
+    }
+
+    private void getUserData() {
         database.getReference("Users").child(userId).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -96,22 +135,19 @@ public class SetupActivity extends AppCompatActivity {
                         Toast.makeText(SetupActivity.this, "Data exists! ", Toast.LENGTH_LONG).show();
                         String name = task.getResult().child("name").getValue().toString();
                         setupEditText.setText(name);
+                        String image = task.getResult().child("image").getValue().toString();
 
-
-                        //TODO after adding pick image
-//                        String image = task.getResult().child("image").getValue().toString();
+                        //TODO maybe needed
 //                        mainImageUri = Uri.parse(image);
 
-
-                        //TODO after adding pick image
                         //while glide is loading the image we put the default image at the imageview instead of blank.
-//                        RequestOptions placeHolderRequest = new RequestOptions();
-//                        placeHolderRequest.placeholder(R.drawable.default_profile);
-//                        Glide.with(SetupActivity.this).setDefaultRequestOptions(placeHolderRequest).load(image).into(setupImage);
+                        RequestOptions placeHolderRequest = new RequestOptions();
+                        placeHolderRequest.placeholder(R.drawable.default_profile);
+                        Glide.with(SetupActivity.this).setDefaultRequestOptions(placeHolderRequest).load(image).into(setupImage);
 
 
                     } else {
-                        Toast.makeText(SetupActivity.this, "Data does not exists! ", Toast.LENGTH_LONG).show();
+                        Toast.makeText(SetupActivity.this, "User data does not exists! ", Toast.LENGTH_LONG).show();
                     }
                 } else {
                     String error = task.getException().getMessage();
@@ -121,85 +157,49 @@ public class SetupActivity extends AppCompatActivity {
                 setupBtn.setEnabled(true);
             }
         });
-
-        setupBtn.setOnClickListener(v -> {
-            String userName = setupEditText.getText().toString();
-            setupProgressBar.setVisibility(View.VISIBLE);
-            onlyNameStore(userName);
-
-
-
-
-            //TODO after adding pick image
-//            if(isChanged) {//TODO need to change to true after we use the image picker
-//                if (TextUtils.isEmpty(userName) /*&& mainImageUri != null/*TODO relevant to the image crop and not mandatory*/) {
-//                    userId = firebaseAuth.getCurrentUser().getUid();
-//
-//                    StorageReference imagePath = storageReference.child("profile_images").child(userId + ".jpg");
-//                    imagePath.putFile(mainImageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-//                            if (task.isSuccessful()) {
-//                                storeDatabase(task, userName);
-//                            } else {
-//                                String error = task.getException().getMessage();
-//                                Toast.makeText(SetupActivity.this, "Error: " + error, Toast.LENGTH_LONG).show();
-//                                setupProgressBar.setVisibility(View.INVISIBLE);
-//                            }
-//
-//                        }
-//                    });
-//
-//                }
-//            } else {
-//                storeDatabase(null, userName);
-//            }
-        });
     }
 
-    private void onlyNameStore(String userName) {
-        DatabaseReference myRef = database.getReference("Users");
+    private void bringImagePicker() {
+        CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).setAspectRatio(1,1).start(SetupActivity.this);
+    }
 
-        myRef.child(userId).child("name").setValue(userName).addOnCompleteListener(new OnCompleteListener<Void>() {
+
+    private void storeToDatabase(Task<UploadTask.TaskSnapshot> task, String userName, Uri downloadUri) {
+        DatabaseReference myRef = database.getReference("Users");
+        Map<String, String> userMap = new HashMap<>();
+        userMap.put("name", userName);
+        userMap.put("image", downloadUri.toString());
+        myRef.child(userId).setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()){
-                    Toast.makeText(SetupActivity.this, "The user name has been updated!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(SetupActivity.this, "The user settings have been updated!", Toast.LENGTH_LONG).show();
                     Intent mainIntent = new Intent(SetupActivity.this, MainActivity.class);
                     startActivity(mainIntent);
                     finish();
                 } else {
-                    String error = "Exception at storing name into database!";
+                    String error = "Exception at storing name or image url into database!";
                     Toast.makeText(SetupActivity.this, error, Toast.LENGTH_LONG).show();
                 }
+                setupProgressBar.setVisibility(View.INVISIBLE);
             }
         });
-        setupProgressBar.setVisibility(View.INVISIBLE);
     }
 
-//    private void storeDatabase(Task<UploadTask.TaskSnapshot> task, String userName) {
-//        String downloadUri;
-//        if(task != null) {
-////      Uri donloadUri = task.getResult().getMetadata().getReference().getDownloadUrl();
-//            downloadUri = task.getResult().getMetadata().getReference().getDownloadUrl().toString();
-//            Toast.makeText(SetupActivity.this, "The image is uploaded!", Toast.LENGTH_LONG).show();
-//        } else {//TODO need to check with image picker and than maybe this could be Uri.
-//            downloadUri = mainImageUri.toString();
-//        }
-//
-//        DatabaseReference myRef = database.getReference("Users");
-//
-//        if(myRef.child(userId).child("name").setValue(userName).isComplete() && myRef.child(userId).child("image").setValue(downloadUri).isComplete()){
-//            Toast.makeText(SetupActivity.this, "The user settings have been updated!", Toast.LENGTH_LONG).show();
-//            Intent mainIntent = new Intent(SetupActivity.this, MainActivity.class);
-//            startActivity(mainIntent);
-//            finish();
-//        } else {
-//            String error = "Exception at storing name or image url into database!";
-//            Toast.makeText(SetupActivity.this, error, Toast.LENGTH_LONG).show();
-//        }
-//        setupProgressBar.setVisibility(View.INVISIBLE);
-//    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                mainImageUri = result.getUri();
+                setupImage.setImageURI(mainImageUri);
+                isChanged = true;
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
+        }
+    }
 
     private void findViews() {
         setupToolBar = findViewById(R.id.tb_setup);
@@ -209,7 +209,7 @@ public class SetupActivity extends AppCompatActivity {
         setupProgressBar = findViewById(R.id.pb_setup);
         firebaseAuth = FirebaseAuth.getInstance();
 //        firebaseFirestore = FirebaseFirestore.getInstance();
-//        storageReference = FirebaseStorage.getInstance().getReference();
+        storageReference = FirebaseStorage.getInstance().getReference();
         database = FirebaseDatabase.getInstance();
 
         userId = firebaseAuth.getCurrentUser().getUid();

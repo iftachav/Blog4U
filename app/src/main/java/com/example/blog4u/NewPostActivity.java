@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -16,17 +17,30 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import id.zelory.compressor.Compressor;
+
 
 public class NewPostActivity extends AppCompatActivity {
 
@@ -38,6 +52,9 @@ public class NewPostActivity extends AppCompatActivity {
     private FirebaseDatabase database;
     private String userId;
     private FirebaseAuth firebaseAuth;
+    private StorageReference storageReference;
+    private Bitmap compressedImageFile;
+
 
 
 
@@ -59,58 +76,87 @@ public class NewPostActivity extends AppCompatActivity {
         setSupportActionBar(newPostToolbar);
         getSupportActionBar().setTitle("Add New Post");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        newPostProgBar.bringToFront();
 
         newPostImage.setOnClickListener(v -> {
-            //TODO need to use crop/pick image here just like in setup activity.
-            //TODO also need to copy onActivityResult func and make some changes - part9 4:50~ and from that to get the new post Uri and set the new post image Uri from that
-            Toast.makeText(NewPostActivity.this, "Need to put here image crop", Toast.LENGTH_LONG).show();
+            CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).setMinCropResultSize(512,512).setAspectRatio(1,1).start(NewPostActivity.this);
         });
 
         newPostBtn.setOnClickListener(v -> {
             String description = newPostDescription.getText().toString();
-
-            if(!TextUtils.isEmpty(description) /*&& postImageUri!=null /*TODO after implementing image crop*/){
+            if(!TextUtils.isEmpty(description) && postImageUri!=null ){
                 newPostProgBar.setVisibility(View.VISIBLE);
-                //TODO need to implement here putfile into firebase storage - part9 12:30~
-                //TODO after that, can use Compressor for thumbnails - part 10 7:40~
-
-                withoutImageStore(description);
-
+                storeToDatabase(description);
             }
         });
     }
 
-    private void withoutImageStore(String description) {
-        DatabaseReference myRef = database.getReference("Posts");
+    private void storeToDatabase(String description) {
         //a random id for a new post.
-        String randomPostId = UUID.randomUUID().toString();//FieldValue.serverTimestamp().toString();
-
-        Map<String, String> postMap = new HashMap<>();
-        postMap.put("description", description);
-        postMap.put("userId", userId);
-        postMap.put("timestamp", String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())));
-        //TODO need to add here the image uri
-//        postMap.put("image_url", postImageUri);
-
-        //TODO maybe not needed a random ID
-        myRef.child(randomPostId).setValue(postMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()){
-                    Toast.makeText(NewPostActivity.this, "A new post has been created!", Toast.LENGTH_LONG).show();
-
-
-                    Intent mainIntent = new Intent(NewPostActivity.this, MainActivity.class);
-                    startActivity(mainIntent);
-                    finish();
-                } else {
-                    String error = "Exception at storing postMap into database!";
-                    Toast.makeText(NewPostActivity.this, error, Toast.LENGTH_LONG).show();
+        String randomPostId = UUID.randomUUID().toString();
+        StorageReference postImagePath = storageReference.child("posts_images").child(randomPostId + ".jpg");
+        postImagePath.putFile(postImageUri).addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                //Making a thumbnail.
+                File newImageFile = new File(postImageUri.getPath());
+                try {
+                    compressedImageFile = new Compressor(NewPostActivity.this).setMaxHeight(100).setMaxWidth(100).setQuality(2).compressToBitmap(newImageFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                compressedImageFile.compress(Bitmap.CompressFormat.JPEG,100,baos);
+                byte[] thumbData = baos.toByteArray();
+
+                //uploading the thumbnail.
+                StorageReference postThumbPath = storageReference.child("posts_images/thumbs").child(randomPostId + ".jpg");
+                postThumbPath.putBytes(thumbData).addOnCompleteListener(v -> {
+                    //getting the URI for the image and thumbnail.
+                    postThumbPath.getDownloadUrl().addOnSuccessListener(thumbUri -> {
+                        postImagePath.getDownloadUrl().addOnSuccessListener(uri -> {
+                            DatabaseReference myRef = database.getReference("Posts");
+                            Map<String, String> postMap = new HashMap<>();
+                            postMap.put("description", description);
+                            postMap.put("thumbnail", thumbUri.toString());
+                            postMap.put("userId", userId);
+                            postMap.put("timestamp", String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())));
+                            postMap.put("image_url", uri.toString());
+                            //TODO maybe not needed a random ID
+                            myRef.child(randomPostId).setValue(postMap).addOnCompleteListener(task1 -> {
+                                if(task1.isSuccessful()){
+                                    Toast.makeText(NewPostActivity.this, "A new post has been created!", Toast.LENGTH_LONG).show();
+                                    Intent mainIntent = new Intent(NewPostActivity.this, MainActivity.class);
+                                    startActivity(mainIntent);
+                                    finish();
+                                } else {
+                                    String error = "Exception at storing postMap into database!";
+                                    Toast.makeText(NewPostActivity.this, error, Toast.LENGTH_LONG).show();
+                                }
+                                newPostProgBar.setVisibility(View.INVISIBLE);
+                            });
+                        });
+                    });
+                });
+            } else {
+                newPostProgBar.setVisibility(View.INVISIBLE);
+                String error = task.getException().getMessage();
+                Toast.makeText(NewPostActivity.this, "Error: " + error, Toast.LENGTH_LONG).show();
             }
         });
-        //TODO maybe need to put in isSuccessful
-        newPostProgBar.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                postImageUri = result.getUri();
+                newPostImage.setImageURI(postImageUri);
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
+        }
     }
 
 
@@ -120,8 +166,10 @@ public class NewPostActivity extends AppCompatActivity {
         newPostBtn = findViewById(R.id.btn_new_post);
         newPostImage = findViewById(R.id.iv_new_post);
         newPostProgBar = findViewById(R.id.pb_newPost);
+
         database = FirebaseDatabase.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         userId = firebaseAuth.getCurrentUser().getUid();
+        storageReference = FirebaseStorage.getInstance().getReference();
     }
 }

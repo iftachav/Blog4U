@@ -45,16 +45,6 @@ public class MainActivity extends AppCompatActivity {
         initToolBar();
         initView();
 
-//        Intent intent = new Intent(MainActivity.this, SignInActivity.class);
-//        startActivity(intent);
-
-
-        // Write a message to the database
-
-//        FirebaseDatabase database = FirebaseDatabase.getInstance();
-//        DatabaseReference myRef = database.getReference("message1");
-//
-//        myRef.setValue("Hello, World2!");
     }
 
 
@@ -105,23 +95,18 @@ public class MainActivity extends AppCompatActivity {
             sendToActivity(SignInActivity.class);
         } else {
             currentUserId = mAuth.getCurrentUser().getUid();
-//            DatabaseReference myRef = database.getReference("message1");
-            database.getReference("Users").child(currentUserId).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DataSnapshot> task) {
-                    if(task.isSuccessful()){
-                        if(task.getResult().exists()){
-                            //TODO this what he did in video
-//                            Intent setupIntent = new Intent(MainActivity.this, SetupActivity.class);
-//                            startActivity(setupIntent);
-//                            finish();
-                        }
-                    } else {
-                        String error = task.getException().getMessage();
-                        Toast.makeText(MainActivity.this, "Error: " + error, Toast.LENGTH_LONG).show();
+            database.getReference("Users").child(currentUserId).get().addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    if(!task.getResult().exists()){
+                        Intent setupIntent = new Intent(MainActivity.this, SetupActivity.class);
+                        startActivity(setupIntent);
+                        finish();
                     }
-
+                } else {
+                    String error = task.getException().getMessage();
+                    Toast.makeText(MainActivity.this, "Error: " + error, Toast.LENGTH_LONG).show();
                 }
+
             });
 
 
