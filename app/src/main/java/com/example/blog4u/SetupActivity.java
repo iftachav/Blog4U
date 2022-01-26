@@ -95,7 +95,7 @@ public class SetupActivity extends AppCompatActivity {
 
         setupBtn.setOnClickListener(v -> {
             String userName = setupEditText.getText().toString();
-            if (!TextUtils.isEmpty(userName) && mainImageUri != null/*TODO relevant to the image crop and not mandatory*/) {
+            if (!TextUtils.isEmpty(userName) && mainImageUri != null) {
                 setupProgressBar.setVisibility(View.VISIBLE);
                 if(isChanged) {
                     userId = firebaseAuth.getCurrentUser().getUid();

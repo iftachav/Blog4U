@@ -31,9 +31,8 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_below="@+id/tb_new_post"
-        android:src="@drawable/default_image"
         android:scaleType="centerCrop"
-        ></ImageView>
+        android:src="@drawable/default_image"></ImageView>
 
     <EditText
         android:id="@+id/et_multiLine_new_post"

@@ -23,6 +23,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -33,6 +34,8 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -119,8 +122,14 @@ public class NewPostActivity extends AppCompatActivity {
                             postMap.put("description", description);
                             postMap.put("thumbnail", thumbUri.toString());
                             postMap.put("userId", userId);
-                            postMap.put("timestamp", String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())));
                             postMap.put("image_url", uri.toString());
+                            postMap.put("likesCount", "0");
+
+                            //made date at specific format
+                            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                            Date date = new Date();
+                            postMap.put("timestamp", String.valueOf(formatter.format(date)));
+
                             //TODO maybe not needed a random ID
                             myRef.child(randomPostId).setValue(postMap).addOnCompleteListener(task1 -> {
                                 if(task1.isSuccessful()){

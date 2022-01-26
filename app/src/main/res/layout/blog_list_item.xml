@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/main_blog_post"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/circle_imv_blog_list_user_image"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/default_profile"></de.hdodenhof.circleimageview.CircleImageView>
+
+            <TextView
+                android:id="@+id/tv_blog_list_user_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/circle_imv_blog_list_user_image"
+                android:layout_toRightOf="@+id/circle_imv_blog_list_user_image"
+                android:text="UserName"
+                android:textStyle="bold"></TextView>
+
+            <TextView
+                android:id="@+id/tv_blog_list_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_blog_list_user_name"
+                android:layout_alignStart="@+id/tv_blog_list_user_name"
+                android:text="Blog Post Date"></TextView>
+
+            <ImageView
+                android:id="@+id/imv_blog_list_image"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_below="@+id/circle_imv_blog_list_user_image"
+                android:layout_marginTop="8dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/default_image"></ImageView>
+
+            <TextView
+                android:id="@+id/tv_blog_list_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/imv_blog_list_image"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:text="This is Description"></TextView>
+
+            <ImageView
+                android:id="@+id/imv_blog_list_like"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_below="@+id/tv_blog_list_description"
+                android:layout_marginLeft="10dp"
+                android:src="@mipmap/action_like_gray"></ImageView>
+
+            <TextView
+                android:id="@+id/tv_blog_list_like_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/imv_blog_list_like"
+                android:layout_toRightOf="@+id/imv_blog_list_like"
+                android:layout_alignBottom="@+id/imv_blog_list_like"
+                android:text="0 Likes"
+                android:textSize="18sp"></TextView>
+        </RelativeLayout>
+
+
+    </androidx.cardview.widget.CardView>
+</RelativeLayout>

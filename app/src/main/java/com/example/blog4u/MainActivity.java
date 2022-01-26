@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void initView() {
+        //TODO maybe need to check if currentuser is not null from mAuth.
         replaceFragment(homeFragment);
         addPostBtn.setOnClickListener(v -> {
             Intent newPostIntent = new Intent(MainActivity.this, NewPostActivity.class);
