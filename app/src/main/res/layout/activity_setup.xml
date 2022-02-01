@@ -11,8 +11,7 @@
         android:id="@+id/tb_setup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/primary"
-        ></androidx.appcompat.widget.Toolbar>
+        android:background="@color/primary"></androidx.appcompat.widget.Toolbar>
 
     <ProgressBar
         android:id="@+id/pb_setup"
@@ -43,6 +42,7 @@
         android:layout_marginTop="60dp"
         android:hint="Your Name:"
         android:textCursorDrawable="@null"
+        android:backgroundTint="@color/accent"
         android:textSize="18sp"></EditText>
 
     <Button

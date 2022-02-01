@@ -56,20 +56,26 @@ public class MainActivity extends AppCompatActivity {
             startActivity(newPostIntent);
         });
 
+
+        initializeFragment();
+
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frameLayout_main);
+
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch(item.getItemId()){
                     case R.id.bottom_action_home:
-                        replaceFragment(homeFragment);
+                        replaceFragment(homeFragment/*, currentFragment*/);
                         return true;
 
                     case R.id.bottom_action_account:
-                        replaceFragment(accountFragment);
+                        replaceFragment(accountFragment/*, currentFragment*/);
                         return true;
 
                     case R.id.bottom_action_notifications:
-                        replaceFragment(notificationsFragment);
+                        replaceFragment(notificationsFragment/*, currentFragment*/);
                         return true;
 
                     default:
@@ -78,6 +84,17 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void initializeFragment() {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.frameLayout_main, homeFragment);
+        fragmentTransaction.add(R.id.frameLayout_main, notificationsFragment);
+        fragmentTransaction.add(R.id.frameLayout_main, accountFragment);
+
+        fragmentTransaction.hide(notificationsFragment);
+        fragmentTransaction.hide(accountFragment);
+        fragmentTransaction.commit();
     }
 
     private void initToolBar() {
@@ -145,18 +162,29 @@ public class MainActivity extends AppCompatActivity {
     private void logOut() {
         mAuth.signOut();
         sendToActivity(SignInActivity.class);
+        finish();
     }
 
     private void sendToActivity(Class <?> destination) {
         Intent mainIntent = new Intent(MainActivity.this, destination);
         startActivity(mainIntent);
-        //TODO maybe need to not finish (currently the app stuck at account settings if user loged in).
-        finish();
     }
 
-    private void replaceFragment(Fragment fragment){
+    private void replaceFragment(Fragment fragment/*, Fragment currentFragment*/){
+        //TODO need to check if currentFragment is needed.
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameLayout_main, fragment);
+        if(fragment == homeFragment){
+            fragmentTransaction.hide(accountFragment);
+            fragmentTransaction.hide(notificationsFragment);
+        } else if(fragment == accountFragment) {
+            fragmentTransaction.hide(homeFragment);
+            fragmentTransaction.hide(notificationsFragment);
+        } else if(fragment == notificationsFragment) {
+            fragmentTransaction.hide(homeFragment);
+            fragmentTransaction.hide(accountFragment);
+        }
+        fragmentTransaction.show(fragment);
+//        fragmentTransaction.replace(R.id.frameLayout_main, fragment);
         fragmentTransaction.commit();
     }
 

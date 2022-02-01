@@ -87,12 +87,12 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void findViews() {
-        signUp = findViewById(R.id.btn_singUp);
+        signUp = findViewById(R.id.btn_signUp);
         moveToSignIn = findViewById(R.id.btn_moveToSignIn);
         signUpEmail = findViewById(R.id.et_signUpEmail);
         signUpPassword = findViewById(R.id.et_signUpPassword);
         signUpRePassword = findViewById(R.id.et_signUpRePassword);
-        signUpProgBar = findViewById(R.id.pb_singUp);
+        signUpProgBar = findViewById(R.id.pb_signUp);
         mAuth = FirebaseAuth.getInstance();
     }
 

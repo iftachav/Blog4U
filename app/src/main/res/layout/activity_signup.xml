@@ -9,7 +9,7 @@
     tools:context=".SignUpActivity">
 
     <ProgressBar
-        android:id="@+id/pb_singUp"
+        android:id="@+id/pb_signUp"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,7 +19,7 @@
         ></ProgressBar>
 
     <ImageView
-        android:id="@+id/img_icon_singUp"
+        android:id="@+id/img_icon_signUp"
         android:layout_width="200dp"
         android:layout_height="150dp"
         android:layout_marginTop="10dp"
@@ -28,18 +28,17 @@
         ></ImageView>
 
 
-
-        <TextView
-            android:id="@+id/tv_signUp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
-            android:layout_below="@+id/img_icon_singUp"
-            android:text="Sing up"
-            android:textColor="@color/black"
-            android:textSize="30dp"
-            android:textStyle="bold"></TextView>
+    <TextView
+        android:id="@+id/tv_signUp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/img_icon_signUp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="Sign up"
+        android:textColor="@color/black"
+        android:textSize="30dp"
+        android:textStyle="bold"></TextView>
 
 
     <EditText
@@ -79,7 +78,7 @@
             android:inputType="textPassword" />
 
         <Button
-            android:id="@+id/btn_singUp"
+            android:id="@+id/btn_signUp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/et_signUpRePassword"

@@ -1,15 +1,15 @@
 package com.example.blog4u;
 
 public class BlogPost {
-    private String userId, image_url, description, thumbnail, timestamp, likesCount, blogId;
-    //TODO maybe need to put timestamp as Timestamp variable.
+    private String userId, image_url, description, thumbnail, timestamp, likesCount, blogId, commentsCount;
+
 
 
     public BlogPost(){}
 
 
 
-    public BlogPost(String userId, String image_url, String description, String thumbnail, String timestamp, String likesCount, String blogId) {
+    public BlogPost(String userId, String image_url, String description, String thumbnail, String timestamp, String likesCount, String blogId, String commentsCount) {
         this.userId = userId;
         this.image_url = image_url;
         this.description = description;
@@ -17,6 +17,15 @@ public class BlogPost {
         this.timestamp = timestamp;
         this.likesCount = likesCount;
         this.blogId = blogId;
+        this.commentsCount = commentsCount;
+    }
+
+    public String getCommentsCount() {
+        return commentsCount;
+    }
+
+    public void setCommentsCount(String commentsCount) {
+        this.commentsCount = commentsCount;
     }
 
     public String getBlogId() {

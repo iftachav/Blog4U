@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -53,19 +54,12 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
-    private void initBlogs() {
+    public void initBlogs() {
         //TODO maybe need to put if user is logged in here.
-        DatabaseReference myref = database.getReference("Posts");
-
-//        Query firstQuery = myref.orderByChild("timestamp").limitToLast(1);
-
-        myref.orderByChild("timestamp").addChildEventListener(new ChildEventListener() {
+        database.getReference("Posts").orderByChild("timestamp").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 BlogPost blogPost = makeNewBlogFromSnapshot(snapshot);
-
-
-                //TODO need to change to descending order. part14 12:30~
                 //positioning the newest element first (to be shown first on feed).
                 blogList.add(0,blogPost);
                 blogRecyclerAdapter.notifyDataSetChanged();
@@ -85,6 +79,15 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                Log.d("pttt", "itemRemoved");
+                BlogPost blogPost = makeNewBlogFromSnapshot(snapshot);
+                for (int i = 0; i < blogList.size(); i++) {
+                    if(blogList.get(i).getBlogId().equals(blogPost.getBlogId())){
+                        blogList.remove(i);
+                        break;
+                    }
+                }
+                blogRecyclerAdapter.notifyDataSetChanged();
 
             }
 
@@ -110,7 +113,8 @@ public class HomeFragment extends Fragment {
         String timestamp = String.valueOf(currentMap.get("timestamp"));
         String blogId = String.valueOf(snapshot.getKey());
         String likesCount = String.valueOf(currentMap.get("likesCount"));
-        return new BlogPost(userId,image_url,description,thumbnail,timestamp, likesCount, blogId);
+        String commentsCount = String.valueOf(currentMap.get("commentsCount"));
+        return new BlogPost(userId,image_url,description,thumbnail,timestamp, likesCount, blogId, commentsCount);
     }
 
     private void findViews(View view) {

@@ -40,18 +40,18 @@
         android:textStyle="bold"></TextView>
 
 
-        <EditText
-            android:id="@+id/et_signInEmail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tv_signIn"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="50dp"
-            android:backgroundTint="@color/accent"
-            android:hint="Email:"
-            android:textCursorDrawable="@null"
-            android:textSize="18sp"
-            android:inputType="textEmailAddress" />
+    <EditText
+        android:id="@+id/et_signInEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_signIn"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:backgroundTint="@color/accent"
+        android:hint="Email:"
+        android:inputType="textEmailAddress"
+        android:textCursorDrawable="@null"
+        android:textSize="18sp" />
 
         <EditText
             android:id="@+id/et_signInPassword"

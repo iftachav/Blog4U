@@ -125,6 +125,9 @@ public class NewPostActivity extends AppCompatActivity {
                             postMap.put("image_url", uri.toString());
                             postMap.put("likesCount", "0");
 
+                            //TODO comments count
+                            postMap.put("commentsCount", "0");
+
                             //made date at specific format
                             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                             Date date = new Date();

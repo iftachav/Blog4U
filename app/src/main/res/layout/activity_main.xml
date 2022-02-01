@@ -13,8 +13,7 @@
         android:id="@+id/tb_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/primary"
-        ></androidx.appcompat.widget.Toolbar>
+        android:background="@color/primary"></androidx.appcompat.widget.Toolbar>
 
     <FrameLayout
         android:id="@+id/frameLayout_main"
@@ -29,11 +28,12 @@
         android:id="@+id/fb_main"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/bnv_main"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:backgroundTint="@color/accent"
-        android:layout_above="@+id/bnv_main"
+        android:elevation="0dp"
         android:src="@android:drawable/ic_input_add"></com.google.android.material.floatingactionbutton.FloatingActionButton>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
