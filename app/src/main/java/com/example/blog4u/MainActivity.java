@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
         findViews();
         initToolBar();
+        if(mAuth.getCurrentUser() != null)
         initView();
 
     }
@@ -111,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if(currentUser == null){
             sendToActivity(SignInActivity.class);
+            finish();
         } else {
             currentUserId = mAuth.getCurrentUser().getUid();
             database.getReference("Users").child(currentUserId).get().addOnCompleteListener(task -> {

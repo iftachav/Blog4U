@@ -64,10 +64,7 @@ public class SignInActivity extends AppCompatActivity {
 
     private void myStartAcitivity(Class<?> activityClass) {
         Intent myIntent = new Intent(this, activityClass);
-//        initBundle();
-//        myIntent.putExtra(BUNDLE_KEY, bundle);
         startActivity(myIntent);
-//        finish();
     }
 
     private void findViews() {
@@ -108,6 +105,7 @@ public class SignInActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         finish();
+                        System.exit(0);
                     }
 
                 })
