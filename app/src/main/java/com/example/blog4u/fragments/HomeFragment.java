@@ -1,11 +1,10 @@
-package com.example.blog4u;
+package com.example.blog4u.fragments;
 
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,18 +13,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.blog4u.etc.BlogPost;
+import com.example.blog4u.R;
+import com.example.blog4u.adapters.BlogRecyclerAdapter;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EventListener;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,8 +61,29 @@ public class HomeFragment extends Fragment {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 BlogPost blogPost = makeNewBlogFromSnapshot(snapshot);
+
                 //positioning the newest element first (to be shown first on feed).
-                blogList.add(0,blogPost);
+                boolean addedToList = false;
+                if(blogList.size() == 0){
+                    blogList.add(0,blogPost);
+                } else {
+                    String date = blogPost.getTimestamp();
+                    try {
+                        Date dateFromPost = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(date);
+                        for (int i = 0; i < blogList.size(); i++) {
+                            Date currentDateFromPost = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(blogList.get(i).getTimestamp());
+                            if (dateFromPost.after(currentDateFromPost)) {
+                                blogList.add(i, blogPost);
+                                addedToList = true;
+                                break;
+                            }
+                        }
+                        if(!addedToList)
+                            blogList.add(blogList.size(),blogPost);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
                 blogRecyclerAdapter.notifyDataSetChanged();
             }
 
@@ -81,6 +103,8 @@ public class HomeFragment extends Fragment {
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
                 Log.d("pttt", "itemRemoved");
                 BlogPost blogPost = makeNewBlogFromSnapshot(snapshot);
+                String currentUserId = blogPost.getUserId();
+                decreasePostsCount(currentUserId);
                 for (int i = 0; i < blogList.size(); i++) {
                     if(blogList.get(i).getBlogId().equals(blogPost.getBlogId())){
                         blogList.remove(i);
@@ -100,6 +124,17 @@ public class HomeFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.d("pttt", "canceled download posts");
 
+            }
+        });
+    }
+
+    private void decreasePostsCount(String userId) {
+        database.getReference("Users").child(userId).child("postsCount").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                int currentPostsCount = Integer.parseInt(task.getResult().getValue().toString());
+                currentPostsCount-=1;
+                database.getReference("Users").child(userId).child("postsCount").setValue(currentPostsCount);
             }
         });
     }

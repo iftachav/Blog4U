@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/iftach avraham/AndroidStudioProjects/Blog4U/app/src/main/res/layout/account_list_item.xml" value="0.18" />
         <entry key="..\:/Users/iftach avraham/AndroidStudioProjects/Blog4U/app/src/main/res/layout/activity_comments.xml" value="0.33" />
         <entry key="..\:/Users/iftach avraham/AndroidStudioProjects/Blog4U/app/src/main/res/layout/activity_login.xml" value="0.33" />
         <entry key="..\:/Users/iftach avraham/AndroidStudioProjects/Blog4U/app/src/main/res/layout/activity_main.xml" value="0.25" />
@@ -13,8 +14,8 @@
         <entry key="..\:/Users/iftach avraham/AndroidStudioProjects/Blog4U/app/src/main/res/layout/activity_signup.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/iftach avraham/AndroidStudioProjects/Blog4U/app/src/main/res/layout/activity_singup.xml" value="0.33" />
         <entry key="..\:/Users/iftach avraham/AndroidStudioProjects/Blog4U/app/src/main/res/layout/activity_stam.xml" value="0.20520833333333333" />
-        <entry key="..\:/Users/iftach avraham/AndroidStudioProjects/Blog4U/app/src/main/res/layout/blog_list_item.xml" value="0.5" />
-        <entry key="..\:/Users/iftach avraham/AndroidStudioProjects/Blog4U/app/src/main/res/layout/comment_list_item.xml" value="0.33" />
+        <entry key="..\:/Users/iftach avraham/AndroidStudioProjects/Blog4U/app/src/main/res/layout/blog_list_item.xml" value="0.394990366088632" />
+        <entry key="..\:/Users/iftach avraham/AndroidStudioProjects/Blog4U/app/src/main/res/layout/comment_list_item.xml" value="0.5" />
         <entry key="..\:/Users/iftach avraham/AndroidStudioProjects/Blog4U/app/src/main/res/layout/fragment_account.xml" value="0.33" />
         <entry key="..\:/Users/iftach avraham/AndroidStudioProjects/Blog4U/app/src/main/res/layout/fragment_home.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/iftach avraham/AndroidStudioProjects/Blog4U/app/src/main/res/layout/fragment_notifications.xml" value="0.25416666666666665" />

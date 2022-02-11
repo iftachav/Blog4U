@@ -1,4 +1,4 @@
-package com.example.blog4u;
+package com.example.blog4u.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,14 +12,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.example.blog4u.R;
+import com.example.blog4u.fragments.AccountFragment;
+import com.example.blog4u.fragments.HomeFragment;
+import com.example.blog4u.fragments.NotificationsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity {
@@ -44,13 +45,12 @@ public class MainActivity extends AppCompatActivity {
         findViews();
         initToolBar();
         if(mAuth.getCurrentUser() != null)
-        initView();
+            initView();
 
     }
 
 
     private void initView() {
-        //TODO maybe need to check if currentuser is not null from mAuth.
         replaceFragment(homeFragment);
         addPostBtn.setOnClickListener(v -> {
             Intent newPostIntent = new Intent(MainActivity.this, NewPostActivity.class);

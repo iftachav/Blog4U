@@ -1,4 +1,4 @@
-package com.example.blog4u;
+package com.example.blog4u.activities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,6 +13,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.blog4u.R;
+import com.example.blog4u.adapters.CommentRecyclerAdapter;
+import com.example.blog4u.etc.Comment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,6 +25,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,7 +64,30 @@ public class CommentsActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 Comment comment = makeNewCommentFromSnapshot(snapshot);
-                commentsList.add(0,comment);
+
+                //positioning the newest element first (to be shown first on feed).
+                boolean addedToList = false;
+                if(commentsList.size() == 0){
+                    commentsList.add(0,comment);
+                } else {
+                    String date = comment.getTimestamp();
+                    try {
+                        Date dateFromPost = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(date);
+                        for (int i = 0; i < commentsList.size(); i++) {
+                            Date currentDateFromPost = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(commentsList.get(i).getTimestamp());
+                            if (dateFromPost.after(currentDateFromPost)) {
+                                commentsList.add(i, comment);
+                                addedToList = true;
+                                break;
+                            }
+                        }
+                        if(!addedToList)
+                            commentsList.add(commentsList.size(),comment);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+//                commentsList.add(0,comment);
 //                Log.d("pttt", comment.getMessage());
                 commentRecyclerAdapter.notifyDataSetChanged();
             }

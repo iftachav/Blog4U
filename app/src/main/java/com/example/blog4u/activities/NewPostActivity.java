@@ -1,4 +1,4 @@
-package com.example.blog4u;
+package com.example.blog4u.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,18 +16,15 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.blog4u.R;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ServerValue;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -38,9 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import id.zelory.compressor.Compressor;
 
@@ -136,6 +131,9 @@ public class NewPostActivity extends AppCompatActivity {
                             //TODO maybe not needed a random ID
                             myRef.child(randomPostId).setValue(postMap).addOnCompleteListener(task1 -> {
                                 if(task1.isSuccessful()){
+                                    //increase posts count for current user.
+                                    increasePostsCount();
+
                                     Toast.makeText(NewPostActivity.this, "A new post has been created!", Toast.LENGTH_LONG).show();
                                     Intent mainIntent = new Intent(NewPostActivity.this, MainActivity.class);
                                     startActivity(mainIntent);
@@ -153,6 +151,17 @@ public class NewPostActivity extends AppCompatActivity {
                 newPostProgBar.setVisibility(View.INVISIBLE);
                 String error = task.getException().getMessage();
                 Toast.makeText(NewPostActivity.this, "Error: " + error, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void increasePostsCount() {
+        database.getReference("Users").child(userId).child("postsCount").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                int currentPostsCount = Integer.parseInt(task.getResult().getValue().toString());
+                currentPostsCount+=1;
+                database.getReference("Users").child(userId).child("postsCount").setValue(currentPostsCount);
             }
         });
     }

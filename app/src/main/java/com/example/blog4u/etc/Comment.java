@@ -1,4 +1,4 @@
-package com.example.blog4u;
+package com.example.blog4u.etc;
 
 public class Comment {
 

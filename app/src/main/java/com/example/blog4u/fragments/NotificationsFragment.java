@@ -1,4 +1,4 @@
-package com.example.blog4u;
+package com.example.blog4u.fragments;
 
 import android.os.Bundle;
 
@@ -13,6 +13,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.blog4u.etc.Notification;
+import com.example.blog4u.R;
+import com.example.blog4u.adapters.NotificationRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;

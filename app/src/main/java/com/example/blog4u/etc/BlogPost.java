@@ -1,4 +1,4 @@
-package com.example.blog4u;
+package com.example.blog4u.etc;
 
 public class BlogPost {
     private String userId, image_url, description, thumbnail, timestamp, likesCount, blogId, commentsCount;

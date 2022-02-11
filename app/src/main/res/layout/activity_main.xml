@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
 
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".activities.MainActivity">
 
 
     <androidx.appcompat.widget.Toolbar
@@ -19,9 +19,8 @@
         android:id="@+id/frameLayout_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tb_main"
         android:layout_above="@+id/bnv_main"
-        ></FrameLayout>
+        android:layout_below="@id/tb_main"></FrameLayout>
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

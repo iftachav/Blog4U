@@ -1,4 +1,4 @@
-package com.example.blog4u;
+package com.example.blog4u.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -16,8 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.blog4u.etc.BlogPost;
+import com.example.blog4u.activities.CommentsActivity;
+import com.example.blog4u.R;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -239,7 +241,7 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
         private TextView blogLikeCount;
         private TextView blogCommentCount;
         private ImageView blogCommentsImageView;
-        private TextView blogCommentsCount;
+//        private TextView blogCommentsCount;
         private Button blogDeleteBtn;
 
 
@@ -290,7 +292,7 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
 
         private void findViews() {
             blogCommentsImageView = mView.findViewById(R.id.imv_blog_list_comments);
-            blogCommentsCount = mView.findViewById(R.id.tv_blog_list_comments_count);
+//            blogCommentsCount = mView.findViewById(R.id.tv_blog_list_comments_count);
             blogDeleteBtn = mView.findViewById(R.id.btn_blog_list_delete);
             descView = mView.findViewById(R.id.tv_blog_list_description);
             blogImageView = mView.findViewById(R.id.imv_blog_list_image);

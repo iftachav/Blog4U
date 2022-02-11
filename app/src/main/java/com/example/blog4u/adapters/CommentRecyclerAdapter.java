@@ -1,4 +1,4 @@
-package com.example.blog4u;
+package com.example.blog4u.adapters;
 
 import android.content.Context;
 import android.util.Log;
@@ -12,15 +12,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.example.blog4u.etc.Comment;
+import com.example.blog4u.R;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -50,6 +47,8 @@ public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecycler
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         String commentMessage = commentsList.get(position).getMessage();
         holder.setCommentMessage(commentMessage);
+        String commentTimestamp = commentsList.get(position).getTimestamp();
+        holder.setCommentTimestamp(commentTimestamp);
         String userId = commentsList.get(position).getUserId();
         database.getReference("Users").child(userId).get().addOnCompleteListener(task -> {
             if(task.isSuccessful()){
@@ -79,26 +78,38 @@ public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecycler
         private TextView commentMessage;
         private CircleImageView commentUserImage;
         private TextView commentUserName;
+        private TextView commentTimestamp;
 
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             mView = itemView;
+            findViews();
         }
 
+
         public void setCommentMessage(String message){
-            commentMessage = mView.findViewById(R.id.tv_comment_list_message);
             commentMessage.setText(message);
         }
 
         public void setUserData(String name, String image){
-            commentUserName = mView.findViewById(R.id.tv_comment_list_user_name);
-            commentUserImage = mView.findViewById(R.id.circle_imv_comment_list_user_image);
             commentUserName.setText(name);
             RequestOptions placeHolderOption = new RequestOptions();
             placeHolderOption.placeholder(R.drawable.default_profile);
             Glide.with(context).applyDefaultRequestOptions(placeHolderOption).load(image).into(commentUserImage);
         }
+
+        public void setCommentTimestamp(String timestamp) {
+            commentTimestamp.setText(timestamp);
+        }
+
+        private void findViews() {
+            commentTimestamp = mView.findViewById(R.id.tv_comment_list_timestamp);
+            commentUserName = mView.findViewById(R.id.tv_comment_list_user_name);
+            commentUserImage = mView.findViewById(R.id.circle_imv_comment_list_user_image);
+            commentMessage = mView.findViewById(R.id.tv_comment_list_message);
+        }
+
     }
 
 }
