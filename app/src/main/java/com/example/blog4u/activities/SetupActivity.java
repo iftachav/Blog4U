@@ -54,6 +54,7 @@ public class SetupActivity extends AppCompatActivity {
     private String userId;
     private Boolean isChanged = false;
     private Uri mainImageUri = null;
+    private boolean newUser = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,7 +146,19 @@ public class SetupActivity extends AppCompatActivity {
         Map<String, String> userMap = new HashMap<>();
         userMap.put("name", userName);
         userMap.put("image", downloadUri.toString());
-        userMap.put("postsCount", "0");
+        if(newUser) {
+            userMap.put("postsCount", "0");
+            storeMap(myRef, userMap);
+        } else{
+            myRef.child(userId).child("postsCount").get().addOnCompleteListener(task12 -> {
+                String currentCountStr = task12.getResult().getValue().toString();
+                userMap.put("postsCount", currentCountStr);
+                storeMap(myRef, userMap);
+            });
+        }
+    }
+
+    private void storeMap(DatabaseReference myRef, Map<String, String> userMap){
         myRef.child(userId).setValue(userMap).addOnCompleteListener(task1 -> {
             if(task1.isSuccessful()){
                 Toast.makeText(SetupActivity.this, "The user settings have been updated!", Toast.LENGTH_LONG).show();
@@ -182,6 +195,7 @@ public class SetupActivity extends AppCompatActivity {
         setupBtn = findViewById(R.id.btn_setup);
         setupEditText = findViewById(R.id.et_setup);
         setupProgressBar = findViewById(R.id.pb_setup);
+        newUser = getIntent().getBooleanExtra("new", false);
         firebaseAuth = FirebaseAuth.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference();
         database = FirebaseDatabase.getInstance();

@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private HomeFragment homeFragment;
     private AccountFragment accountFragment;
     private NotificationsFragment notificationsFragment;
+    private boolean newUser = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if(currentUser == null){
-            sendToActivity(SignInActivity.class);
+            sendToActivity(SignInActivity.class, true);
             finish();
         } else {
             currentUserId = mAuth.getCurrentUser().getUid();
@@ -120,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 if(task.isSuccessful()){
                     if(!task.getResult().exists()){
                         Intent setupIntent = new Intent(MainActivity.this, SetupActivity.class);
+                        setupIntent.putExtra("new",true);
                         startActivity(setupIntent);
                         finish();
                     }
@@ -151,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
                 logOut();
                 return true;
             case R.id.action_settings_btn:
-                sendToActivity(SetupActivity.class);
+                sendToActivity(SetupActivity.class, newUser);
                 return true;
 
 
@@ -162,12 +164,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void logOut() {
         mAuth.signOut();
-        sendToActivity(SignInActivity.class);
+        sendToActivity(SignInActivity.class, newUser);
         finish();
     }
 
-    private void sendToActivity(Class <?> destination) {
+    private void sendToActivity(Class <?> destination, boolean newUser) {
         Intent mainIntent = new Intent(MainActivity.this, destination);
+        mainIntent.putExtra("new",newUser);
         startActivity(mainIntent);
     }
 

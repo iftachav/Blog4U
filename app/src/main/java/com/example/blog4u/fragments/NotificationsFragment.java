@@ -22,7 +22,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,9 +57,33 @@ public class NotificationsFragment extends Fragment {
         database.getReference("Notifications").child(firebaseAuth.getCurrentUser().getUid()).orderByChild("timestamp").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                Log.d("pttt", ""+snapshot);
+//                Log.d("pttt", ""+snapshot);
+
                 Notification notification= makeNewNotificationFromSnapshot(snapshot);
-                notificationList.add(0,notification);
+                //positioning the newest element first (to be shown first on feed).
+                boolean addedToList = false;
+                if(notificationList.size() == 0){
+                    notificationList.add(0,notification);
+                } else {
+                    String date = notification.getTimestamp();
+                    try {
+                        Date dateFromPost = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(date);
+                        for (int i = 0; i < notificationList.size(); i++) {
+                            Date currentDateFromPost = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(notificationList.get(i).getTimestamp());
+                            if (dateFromPost.after(currentDateFromPost)) {
+                                notificationList.add(i, notification);
+                                addedToList = true;
+                                break;
+                            }
+                        }
+                        if(!addedToList)
+                            notificationList.add(notificationList.size(),notification);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+//                notificationList.add(0,notification);
                 notificationRecyclerAdapter.notifyDataSetChanged();
             }
 

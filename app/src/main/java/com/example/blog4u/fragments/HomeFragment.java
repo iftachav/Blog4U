@@ -128,13 +128,12 @@ public class HomeFragment extends Fragment {
     }
 
     private void decreasePostsCount(String userId) {
-        database.getReference("Users").child(userId).child("postsCount").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                int currentPostsCount = Integer.parseInt(task.getResult().getValue().toString());
-                currentPostsCount-=1;
-                database.getReference("Users").child(userId).child("postsCount").setValue(currentPostsCount);
-            }
+        database.getReference("Users").child(userId).child("postsCount").get().addOnCompleteListener(task -> {
+            int currentPostsCount = Integer.parseInt(task.getResult().getValue().toString());
+            currentPostsCount-=1;
+            if(currentPostsCount<0)
+                currentPostsCount=0;
+            database.getReference("Users").child(userId).child("postsCount").setValue(currentPostsCount);
         });
     }
 

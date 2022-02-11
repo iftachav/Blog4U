@@ -128,12 +128,13 @@ public class AccountFragment extends Fragment {
         database.getReference("Users").child(uid).child("postsCount").get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 String currentPostsCount = task.getResult().getValue().toString();
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        postsCount.setText(currentPostsCount);
-                    }
-                });
+                postsCount.setText(currentPostsCount);
+//                getActivity().runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        postsCount.setText(currentPostsCount);
+//                    }
+//                });
             }
         });
     }
