@@ -56,7 +56,6 @@ public class HomeFragment extends Fragment {
     }
 
     public void initBlogs() {
-        //TODO maybe need to put if user is logged in here.
         database.getReference("Posts").orderByChild("timestamp").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {

@@ -42,12 +42,10 @@ public class SignInActivity extends AppCompatActivity {
         signInBtn.setOnClickListener(v -> {
             String emailStr = signInEmail.getText().toString();
             String passStr = signInPassword.getText().toString();
-
             if(!TextUtils.isEmpty(emailStr) && !TextUtils.isEmpty(passStr)){
                 signInProgBar.setVisibility(View.VISIBLE);
                 mAuth.signInWithEmailAndPassword(emailStr,passStr).addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
-                        //TODO maybe can send straight to feed (or maybe the feed is the main activity).
                         sendToMain();
                     } else {
                         String errorMessage = task.getException().getMessage();
@@ -76,11 +74,8 @@ public class SignInActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
-        //TODO not sure this is needed.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            //TODO maybe can send straight to feed?
             sendToMain();
         }
     }
@@ -97,14 +92,9 @@ public class SignInActivity extends AppCompatActivity {
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle("Closing Blog4U!")
                 .setMessage("Are you sure you want to close this app?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                        System.exit(0);
-                    }
-
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    finish();
+                    System.exit(0);
                 })
                 .setNegativeButton("No", null)
                 .show();

@@ -35,7 +35,6 @@ public class SignUpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-
         findViews();
         initButtons();
     }
@@ -53,35 +52,27 @@ public class SignUpActivity extends AppCompatActivity {
     private void initButtons() {
         moveToSignIn.setOnClickListener(view -> finish());
 
-        signUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String emailStr = signUpEmail.getText().toString();
-                String passStr = signUpPassword.getText().toString();
-                String rePassStr = signUpRePassword.getText().toString();
+        signUp.setOnClickListener(v -> {
+            String emailStr = signUpEmail.getText().toString();
+            String passStr = signUpPassword.getText().toString();
+            String rePassStr = signUpRePassword.getText().toString();
 
-                if(!TextUtils.isEmpty(emailStr) && !TextUtils.isEmpty(passStr) && !TextUtils.isEmpty(rePassStr)){
-                    if(passStr.equals(rePassStr)){
-                        signUpProgBar.setVisibility(View.VISIBLE);
-                        mAuth.createUserWithEmailAndPassword(emailStr,passStr).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if(task.isSuccessful()){
-//                                    sendToMain();
-                                    //TODO not sure if needed.
-                                    Intent setupIntent = new Intent(SignUpActivity.this, SetupActivity.class);
-                                    startActivity(setupIntent);
-                                    finish();
-                                } else {
-                                    String errorMessage = task.getException().getMessage();
-                                    Toast.makeText(SignUpActivity.this, "Error: " + errorMessage, Toast.LENGTH_LONG).show();
-                                }
-                                signUpProgBar.setVisibility(View.INVISIBLE);
-                            }
-                        });
-                    } else {
-                        Toast.makeText(SignUpActivity.this, "Retype Password and Password fields does not match!", Toast.LENGTH_LONG).show();
-                    }
+            if(!TextUtils.isEmpty(emailStr) && !TextUtils.isEmpty(passStr) && !TextUtils.isEmpty(rePassStr)){
+                if(passStr.equals(rePassStr)){
+                    signUpProgBar.setVisibility(View.VISIBLE);
+                    mAuth.createUserWithEmailAndPassword(emailStr,passStr).addOnCompleteListener(task -> {
+                        if(task.isSuccessful()){
+                            Intent setupIntent = new Intent(SignUpActivity.this, SetupActivity.class);
+                            startActivity(setupIntent);
+                            finish();
+                        } else {
+                            String errorMessage = task.getException().getMessage();
+                            Toast.makeText(SignUpActivity.this, "Error: " + errorMessage, Toast.LENGTH_LONG).show();
+                        }
+                        signUpProgBar.setVisibility(View.INVISIBLE);
+                    });
+                } else {
+                    Toast.makeText(SignUpActivity.this, "Retype Password and Password fields does not match!", Toast.LENGTH_LONG).show();
                 }
             }
         });

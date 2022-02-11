@@ -77,13 +77,10 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
         holder.setLikesCount(likesCount, false);
         //checking if user already liking this post and changing the heart icon color.
         if(!(Integer.parseInt(likesCount) == 0)){
-            database.getReference("Likes").child(blogId).child(currentUserId).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DataSnapshot> task) {
-                    if(task.getResult().exists())
-                        if(!task.getResult().getValue().toString().equals("null"))
-                            holder.setLikesCount(likesCount, true);
-                }
+            database.getReference("Likes").child(blogId).child(currentUserId).get().addOnCompleteListener(task -> {
+                if(task.getResult().exists())
+                    if(!task.getResult().getValue().toString().equals("null"))
+                        holder.setLikesCount(likesCount, true);
             });
         }
 
@@ -108,14 +105,11 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
         holder.blogDeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                database.getReference("Posts").child(blogId).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()){
-                            //TODO known bug- when creating 2 posts and deleting the top one, the delete button doesnt follow.
+                database.getReference("Posts").child(blogId).removeValue().addOnCompleteListener(task -> {
+                    if(task.isSuccessful()){
+                        //TODO known bug- when creating 2 posts and deleting the top one, the delete button doesnt follow.
 //                            blogList.remove(position);
-                            holder.blogDeleteBtn.setVisibility(View.INVISIBLE);
-                        }
+                        holder.blogDeleteBtn.setVisibility(View.INVISIBLE);
                     }
                 });
                 database.getReference("Likes").child(blogId).removeValue();
@@ -156,71 +150,56 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
             Date date = new Date();
             likesMap.put("timestamp", formatter.format(date));
-            database.getReference("Likes").child(blogList.get(position).getBlogId()).child(currentUserId).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DataSnapshot> task) {
-                    if(!task.getResult().exists()){
-                        changeLikesCount(position, 1);
-                        database.getReference("Likes").child(blogList.get(position).getBlogId()).child(currentUserId).setValue(likesMap);
-                    }
-                    else{
-                        if(task.getResult().getValue().toString().equals("null")){
-                            database.getReference("Likes").child(blogList.get(position).getBlogId()).child(currentUserId).setValue(likesMap);
-                            changeLikesCount(position, 1);
-                        } else {
-                            //TODO maybe need to use remove value
-                            database.getReference("Likes").child(blogList.get(position).getBlogId()).child(currentUserId).setValue("null");
-
-                            changeLikesCount(position, -1);
-                            holder.changeLikeIconColor(false);
-                        }
-                    }
-                    Log.d("pttt", "task result "+ task.getResult().getValue());
+            database.getReference("Likes").child(blogList.get(position).getBlogId()).child(currentUserId).get().addOnCompleteListener(task -> {
+                if(!task.getResult().exists()){
+                    changeLikesCount(position, 1);
+                    database.getReference("Likes").child(blogList.get(position).getBlogId()).child(currentUserId).setValue(likesMap);
                 }
+                else{
+                    if(task.getResult().getValue().toString().equals("null")){
+                        database.getReference("Likes").child(blogList.get(position).getBlogId()).child(currentUserId).setValue(likesMap);
+                        changeLikesCount(position, 1);
+                    } else {
+                        database.getReference("Likes").child(blogList.get(position).getBlogId()).child(currentUserId).setValue("null");
+
+                        changeLikesCount(position, -1);
+                        holder.changeLikeIconColor(false);
+                    }
+                }
+                Log.d("pttt", "task result "+ task.getResult().getValue());
             });
 
-            //TODO adding notification
-            database.getReference("Users").child(currentUserId).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DataSnapshot> task) {
-                    String userActedName = task.getResult().child("name").getValue().toString();
-                    String userActedImage = task.getResult().child("image").getValue().toString();
-                    database.getReference("Posts").child(blogId).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DataSnapshot> task) {
-                            Map<String, String> notificationMap = new HashMap<>();
-                            String postName = task.getResult().child("description").getValue().toString();
-                            if(postName.length()>=30){
-                                postName = postName.substring(0,25);
-                                notificationMap.put("description", userActedName+" liked your post "+postName+"...");
-                            } else {
-                                notificationMap.put("description", userActedName+" liked your post "+postName);
-                            }
-                            notificationMap.put("userActedImage", userActedImage);
-                            //made date at specific format
-                            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                            Date date = new Date();
-                            notificationMap.put("timestamp", String.valueOf(formatter.format(date)));
+            database.getReference("Users").child(currentUserId).get().addOnCompleteListener(task -> {
+                String userActedName = task.getResult().child("name").getValue().toString();
+                String userActedImage = task.getResult().child("image").getValue().toString();
+                database.getReference("Posts").child(blogId).get().addOnCompleteListener(task1 -> {
+                    Map<String, String> notificationMap = new HashMap<>();
+                    String postName = task1.getResult().child("description").getValue().toString();
+                    if(postName.length()>=30){
+                        postName = postName.substring(0,25);
+                        notificationMap.put("description", userActedName+" liked your post "+postName+"...");
+                    } else {
+                        notificationMap.put("description", userActedName+" liked your post "+postName);
+                    }
+                    notificationMap.put("userActedImage", userActedImage);
+                    //made date at specific format
+                    SimpleDateFormat formatter1 = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                    Date date1 = new Date();
+                    notificationMap.put("timestamp", String.valueOf(formatter1.format(date1)));
 
-                            //TODO maybe need onCompleteListener.
-                            database.getReference("Notifications").child(blogUserId).child(currentUserId).setValue(notificationMap);
-                        }
-                    });
-                }
+                    database.getReference("Notifications").child(blogUserId).child(currentUserId).setValue(notificationMap);
+                });
             });
         });
     }
 
     private void changeLikesCount(int position, int i) {
-        database.getReference("Posts").child(blogList.get(position).getBlogId()).child("likesCount").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
+        database.getReference("Posts").child(blogList.get(position).getBlogId()).child("likesCount").get().addOnCompleteListener(task -> {
 //                                Log.d("pttt", "likes count is: "+task.getResult().getValue());
-                int currentLikesCount = Integer.parseInt(task.getResult().getValue().toString());
-                currentLikesCount+=i;
+            int currentLikesCount = Integer.parseInt(task.getResult().getValue().toString());
+            currentLikesCount+=i;
 //                                Log.d("pttt", "likes count is: "+currentLikesCount);
-                database.getReference("Posts").child(blogList.get(position).getBlogId()).child("likesCount").setValue(currentLikesCount);
-            }
+            database.getReference("Posts").child(blogList.get(position).getBlogId()).child("likesCount").setValue(currentLikesCount);
         });
     }
 
@@ -292,7 +271,6 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
 
         private void findViews() {
             blogCommentsImageView = mView.findViewById(R.id.imv_blog_list_comments);
-//            blogCommentsCount = mView.findViewById(R.id.tv_blog_list_comments_count);
             blogDeleteBtn = mView.findViewById(R.id.btn_blog_list_delete);
             descView = mView.findViewById(R.id.tv_blog_list_description);
             blogImageView = mView.findViewById(R.id.imv_blog_list_image);

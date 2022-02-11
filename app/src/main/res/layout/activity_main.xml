@@ -15,6 +15,17 @@
         android:layout_height="wrap_content"
         android:background="@color/primary"></androidx.appcompat.widget.Toolbar>
 
+    <ProgressBar
+        android:id="@+id/pb_main"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/accent"
+        android:layout_below="@+id/tb_main"
+        android:visibility="invisible"
+        ></ProgressBar>
+
     <FrameLayout
         android:id="@+id/frameLayout_main"
         android:layout_width="match_parent"

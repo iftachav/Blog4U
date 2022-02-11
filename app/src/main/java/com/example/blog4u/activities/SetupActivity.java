@@ -49,31 +49,23 @@ public class SetupActivity extends AppCompatActivity {
     private Button setupBtn;
     private FirebaseAuth firebaseAuth;
     private ProgressBar setupProgressBar;
-//    private FirebaseFirestore firebaseFirestore;
-
     private StorageReference storageReference;
     private FirebaseDatabase database ;
     private String userId;
     private Boolean isChanged = false;
-
-
-
     private Uri mainImageUri = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup);
-
         findViews();
         initView();
-
     }
 
     private void initView() {
         setSupportActionBar(setupToolBar);
         getSupportActionBar().setTitle("Account Setup");
-
 
         setupImage.setOnClickListener(v -> {
             if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.M){
@@ -102,24 +94,15 @@ public class SetupActivity extends AppCompatActivity {
                     userId = firebaseAuth.getCurrentUser().getUid();
                     setupProgressBar.setVisibility(View.VISIBLE);
                     StorageReference imagePath = storageReference.child("profile_images").child(userId + ".jpg");
-                    imagePath.putFile(mainImageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                            if (task.isSuccessful()) {
-                                imagePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                    @Override
-                                    public void onSuccess(Uri uri) {
-                                        storeToDatabase(task, userName, uri);
-                                    }
-                                });
-                            } else {
-                                String error = task.getException().getMessage();
-                                Toast.makeText(SetupActivity.this, "Error: " + error, Toast.LENGTH_LONG).show();
-                                setupProgressBar.setVisibility(View.INVISIBLE);
-                            }
+                    imagePath.putFile(mainImageUri).addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            imagePath.getDownloadUrl().addOnSuccessListener(uri -> storeToDatabase(task, userName, uri));
+                        } else {
+                            String error = task.getException().getMessage();
+                            Toast.makeText(SetupActivity.this, "Error: " + error, Toast.LENGTH_LONG).show();
+                            setupProgressBar.setVisibility(View.INVISIBLE);
                         }
                     });
-
                 } else {
                     storeToDatabase(null, userName, mainImageUri);
                 }
@@ -128,35 +111,27 @@ public class SetupActivity extends AppCompatActivity {
     }
 
     private void getUserData() {
-        database.getReference("Users").child(userId).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                if(task.isSuccessful()){
-                    if(task.getResult().exists()){
-                        Toast.makeText(SetupActivity.this, "Data exists! ", Toast.LENGTH_LONG).show();
-                        String name = task.getResult().child("name").getValue().toString();
-                        setupEditText.setText(name);
-                        String image = task.getResult().child("image").getValue().toString();
+        database.getReference("Users").child(userId).get().addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                if(task.getResult().exists()){
+                    Toast.makeText(SetupActivity.this, "Data exists! ", Toast.LENGTH_LONG).show();
+                    String name = task.getResult().child("name").getValue().toString();
+                    setupEditText.setText(name);
+                    String image = task.getResult().child("image").getValue().toString();
 
-                        //TODO maybe needed
-//                        mainImageUri = Uri.parse(image);
-
-                        //while glide is loading the image we put the default image at the imageview instead of blank.
-                        RequestOptions placeHolderRequest = new RequestOptions();
-                        placeHolderRequest.placeholder(R.drawable.default_profile);
-                        Glide.with(SetupActivity.this).setDefaultRequestOptions(placeHolderRequest).load(image).into(setupImage);
-
-
-                    } else {
-                        Toast.makeText(SetupActivity.this, "User data does not exists! ", Toast.LENGTH_LONG).show();
-                    }
+                    //while glide is loading the image we put the default image at the imageview instead of blank.
+                    RequestOptions placeHolderRequest = new RequestOptions();
+                    placeHolderRequest.placeholder(R.drawable.default_profile);
+                    Glide.with(SetupActivity.this).setDefaultRequestOptions(placeHolderRequest).load(image).into(setupImage);
                 } else {
-                    String error = task.getException().getMessage();
-                    Toast.makeText(SetupActivity.this, "Database Error: " + error, Toast.LENGTH_LONG).show();
+                    Toast.makeText(SetupActivity.this, "User data does not exists! ", Toast.LENGTH_LONG).show();
                 }
-                setupProgressBar.setVisibility(View.INVISIBLE);
-                setupBtn.setEnabled(true);
+            } else {
+                String error = task.getException().getMessage();
+                Toast.makeText(SetupActivity.this, "Database Error: " + error, Toast.LENGTH_LONG).show();
             }
+            setupProgressBar.setVisibility(View.INVISIBLE);
+            setupBtn.setEnabled(true);
         });
     }
 
@@ -171,20 +146,17 @@ public class SetupActivity extends AppCompatActivity {
         userMap.put("name", userName);
         userMap.put("image", downloadUri.toString());
         userMap.put("postsCount", "0");
-        myRef.child(userId).setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()){
-                    Toast.makeText(SetupActivity.this, "The user settings have been updated!", Toast.LENGTH_LONG).show();
-                    Intent mainIntent = new Intent(SetupActivity.this, MainActivity.class);
-                    startActivity(mainIntent);
-                    finish();
-                } else {
-                    String error = "Exception at storing name or image url into database!";
-                    Toast.makeText(SetupActivity.this, error, Toast.LENGTH_LONG).show();
-                }
-                setupProgressBar.setVisibility(View.INVISIBLE);
+        myRef.child(userId).setValue(userMap).addOnCompleteListener(task1 -> {
+            if(task1.isSuccessful()){
+                Toast.makeText(SetupActivity.this, "The user settings have been updated!", Toast.LENGTH_LONG).show();
+                Intent mainIntent = new Intent(SetupActivity.this, MainActivity.class);
+                startActivity(mainIntent);
+                finish();
+            } else {
+                String error = "Exception at storing name or image url into database!";
+                Toast.makeText(SetupActivity.this, error, Toast.LENGTH_LONG).show();
             }
+            setupProgressBar.setVisibility(View.INVISIBLE);
         });
     }
 
@@ -199,6 +171,7 @@ public class SetupActivity extends AppCompatActivity {
                 isChanged = true;
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
+                Toast.makeText(SetupActivity.this, "Error: " + error, Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -210,10 +183,8 @@ public class SetupActivity extends AppCompatActivity {
         setupEditText = findViewById(R.id.et_setup);
         setupProgressBar = findViewById(R.id.pb_setup);
         firebaseAuth = FirebaseAuth.getInstance();
-//        firebaseFirestore = FirebaseFirestore.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference();
         database = FirebaseDatabase.getInstance();
-
         userId = firebaseAuth.getCurrentUser().getUid();
     }
 }

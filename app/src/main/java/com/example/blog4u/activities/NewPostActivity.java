@@ -52,11 +52,6 @@ public class NewPostActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private StorageReference storageReference;
     private Bitmap compressedImageFile;
-
-
-
-
-    //TODO maybe need to change the multiline to not be multiLined.
     private EditText newPostDescription;
 
     @Override
@@ -119,8 +114,6 @@ public class NewPostActivity extends AppCompatActivity {
                             postMap.put("userId", userId);
                             postMap.put("image_url", uri.toString());
                             postMap.put("likesCount", "0");
-
-                            //TODO comments count
                             postMap.put("commentsCount", "0");
 
                             //made date at specific format
@@ -128,12 +121,10 @@ public class NewPostActivity extends AppCompatActivity {
                             Date date = new Date();
                             postMap.put("timestamp", String.valueOf(formatter.format(date)));
 
-                            //TODO maybe not needed a random ID
                             myRef.child(randomPostId).setValue(postMap).addOnCompleteListener(task1 -> {
                                 if(task1.isSuccessful()){
                                     //increase posts count for current user.
                                     increasePostsCount();
-
                                     Toast.makeText(NewPostActivity.this, "A new post has been created!", Toast.LENGTH_LONG).show();
                                     Intent mainIntent = new Intent(NewPostActivity.this, MainActivity.class);
                                     startActivity(mainIntent);
@@ -156,13 +147,10 @@ public class NewPostActivity extends AppCompatActivity {
     }
 
     private void increasePostsCount() {
-        database.getReference("Users").child(userId).child("postsCount").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                int currentPostsCount = Integer.parseInt(task.getResult().getValue().toString());
-                currentPostsCount+=1;
-                database.getReference("Users").child(userId).child("postsCount").setValue(currentPostsCount);
-            }
+        database.getReference("Users").child(userId).child("postsCount").get().addOnCompleteListener(task -> {
+            int currentPostsCount = Integer.parseInt(task.getResult().getValue().toString());
+            currentPostsCount+=1;
+            database.getReference("Users").child(userId).child("postsCount").setValue(currentPostsCount);
         });
     }
 
@@ -176,6 +164,7 @@ public class NewPostActivity extends AppCompatActivity {
                 newPostImage.setImageURI(postImageUri);
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
+                Toast.makeText(NewPostActivity.this, "Error: " + error, Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -187,7 +176,6 @@ public class NewPostActivity extends AppCompatActivity {
         newPostBtn = findViewById(R.id.btn_new_post);
         newPostImage = findViewById(R.id.iv_new_post);
         newPostProgBar = findViewById(R.id.pb_newPost);
-
         database = FirebaseDatabase.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         userId = firebaseAuth.getCurrentUser().getUid();

@@ -1,15 +1,19 @@
 package com.example.blog4u.activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.blog4u.R;
@@ -31,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseDatabase database;
     private String currentUserId;
     private BottomNavigationView bottomNavigationView;
-
+    private ProgressBar mainProgBar;
     private HomeFragment homeFragment;
     private AccountFragment accountFragment;
     private NotificationsFragment notificationsFragment;
@@ -51,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void initView() {
+        mainProgBar.bringToFront();
+        mainProgBar.setVisibility(View.VISIBLE);
         replaceFragment(homeFragment);
         addPostBtn.setOnClickListener(v -> {
             Intent newPostIntent = new Intent(MainActivity.this, NewPostActivity.class);
@@ -60,29 +66,23 @@ public class MainActivity extends AppCompatActivity {
 
         initializeFragment();
 
-        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            switch(item.getItemId()){
+                case R.id.bottom_action_home:
+                    replaceFragment(homeFragment);
+                    return true;
 
-            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frameLayout_main);
+                case R.id.bottom_action_account:
+                    replaceFragment(accountFragment);
+                    return true;
 
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch(item.getItemId()){
-                    case R.id.bottom_action_home:
-                        replaceFragment(homeFragment/*, currentFragment*/);
-                        return true;
+                case R.id.bottom_action_notifications:
+                    replaceFragment(notificationsFragment);
+                    return true;
 
-                    case R.id.bottom_action_account:
-                        replaceFragment(accountFragment/*, currentFragment*/);
-                        return true;
+                default:
+                    return false;
 
-                    case R.id.bottom_action_notifications:
-                        replaceFragment(notificationsFragment/*, currentFragment*/);
-                        return true;
-
-                    default:
-                        return false;
-
-                }
             }
         });
     }
@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.hide(notificationsFragment);
         fragmentTransaction.hide(accountFragment);
         fragmentTransaction.commit();
+        mainProgBar.setVisibility(View.INVISIBLE);
     }
 
     private void initToolBar() {
@@ -138,8 +139,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
-
-
         return true;
     }
 
@@ -172,8 +171,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(mainIntent);
     }
 
-    private void replaceFragment(Fragment fragment/*, Fragment currentFragment*/){
-        //TODO need to check if currentFragment is needed.
+    private void replaceFragment(Fragment fragment){
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         if(fragment == homeFragment){
             fragmentTransaction.hide(accountFragment);
@@ -186,8 +184,21 @@ public class MainActivity extends AppCompatActivity {
             fragmentTransaction.hide(accountFragment);
         }
         fragmentTransaction.show(fragment);
-//        fragmentTransaction.replace(R.id.frameLayout_main, fragment);
         fragmentTransaction.commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Closing Blog4U!")
+                .setMessage("Are you sure you want to close this app?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    finish();
+                    System.exit(0);
+                })
+                .setNegativeButton("No", null)
+                .show();
     }
 
     private void findViews() {
@@ -196,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
         addPostBtn = findViewById(R.id.fb_main);
         database = FirebaseDatabase.getInstance();
         bottomNavigationView = findViewById(R.id.bnv_main);
+        mainProgBar = findViewById(R.id.pb_main);
         homeFragment = new HomeFragment();
         notificationsFragment = new NotificationsFragment();
         accountFragment = new AccountFragment();

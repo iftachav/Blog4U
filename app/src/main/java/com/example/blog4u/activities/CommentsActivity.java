@@ -158,7 +158,6 @@ public class CommentsActivity extends AppCompatActivity {
                 });
 
 
-                //TODO adding notification
                 database.getReference("Users").child(firebaseAuth.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DataSnapshot> task) {
